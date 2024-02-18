@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: juice-namespace
+  name: juicedeployment
+  labels:
+    app: juice-shop-app
+    tier: frontend
+spec: 
+  selector: 
+    matchLabels:
+      app: juice-shop-app
+      tier: frontend
+  replicas: 2 
+  strategy:
+      type: RollingUpdate
+      rollingUpdate:
+         maxUnavailable: 25%
+         maxSurge: 1
+  template:
+    metadata:
+      labels: 
+        app: juice-shop-app
+        tier: frontend
+    spec:
+      containers:
+      - image: michaelbraunbass/juiceshop
+        imagePullPolicy: Always
+        name: juice-shop-container
+        ports:
+        - containerPort: 3000
+          name: juice-shop-port
+        securityContext:
+           allowPrivilegeEscalation: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: juice-namespace
+  name: juice-shop-service
+  labels:
+    app: juice-shop-app
+spec: 
+  ports:
+   - port: 1337
+     targetPort: 3000
+  selector:
+    app: juice-shop-app
+    tier: frontend
+  type: LoadBalancer
