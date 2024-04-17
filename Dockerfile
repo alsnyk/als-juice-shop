@@ -6,7 +6,7 @@ RUN npm install --production --unsafe-perm
 RUN npm dedupe
 RUN rm -rf frontend/node_modules
 
-FROM node:16.20.2
+FROM node:18.20.1
 WORKDIR /juice-shop
 RUN  apt-get install curl -y
 RUN  apt install openssl -y
