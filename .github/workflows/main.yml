@@ -1,30 +1,30 @@
-name: Snyk Infrastructure as Code and GitHub Security example
-on: push
+name: "Snyk Code Scan"
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
-  snyk:
+  Pipeline-Job:
+    # Configure Environment
+    name: 'Snyk Code Scan'
     runs-on: ubuntu-latest
+    env:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
     steps:
-    - uses: actions/checkout@v2
+      # Checkout Code
+      - name: Checkout Code
+        uses: actions/checkout@v1
 
-    #Setup Environment
-    - name: "Setup Node.js"
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.x  
-
-       # Scan Terraform Plan
-    - name: Build TF Plan
-      run: |
-        terraform init
-        terraform plan -out tf.plan 
-        terraform show -json tf.plan > tf-plan.json
-            
-    - name: Run Snyk IaC
-      id: snyk
-      continue-on-error: true
-      uses: snyk/actions/iac@master
-      env:
-        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-      with:
-        command: test tf-plan.json --scan=planned-values --sarif-file-output=snyk.sarif
-     
+      # Install and Authenticate to Snyk
+      - name: Install Snyk & Authenticate
+        run: |
+          sudo npm install -g snyk
+          snyk auth ${SNYK_TOKEN}
+      # Run Snyk Code
+      - name: Run Snyk Code
+        run: |
+          snyk code test
+        continue-on-error: true
