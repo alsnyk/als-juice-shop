@@ -28,3 +28,8 @@ jobs:
         run: |
           snyk code test
         continue-on-error: true
+
+      - name: Run Snyk Open Source
+        run: |
+          snyk test
+        continue-on-error: true
